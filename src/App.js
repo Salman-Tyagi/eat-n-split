@@ -50,8 +50,21 @@ export default function App() {
     setShowAddFriend(false);
   }
 
-  function splitBillHandler(e) {
-    e.preventDefault();
+  function splitBillHandler(value) {
+    console.log(value);
+
+    setFriends(
+      friends.map(friend =>
+        friend.id === selectedFriend.id
+          ? {
+              ...friend,
+              balance: friend.balance + value,
+            }
+          : friend
+      )
+    );
+
+    setSelectedFriend(null);
   }
 
   return (
@@ -182,8 +195,16 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
     setWhoIsPaying(e.target.value);
   }
 
+  function submitHandler(e) {
+    e.preventDefault();
+
+    if (!bill || !paidByUser) return;
+
+    onSplitBill(whoIsPaying === 'user' ? friendExpense : -paidByUser);
+  }
+
   return (
-    <form className='form-split-bill' onSubmit={onSplitBill}>
+    <form className='form-split-bill' onSubmit={submitHandler}>
       <h2>Split bill with {selectedFriend.name}</h2>
 
       <label>💰 Bill value</label>
