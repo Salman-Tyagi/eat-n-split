@@ -51,8 +51,6 @@ export default function App() {
   }
 
   function splitBillHandler(value) {
-    console.log(value);
-
     setFriends(
       friends.map(friend =>
         friend.id === selectedFriend.id
@@ -107,10 +105,10 @@ function FriendList({ friends, onSelection, selectedFriend }) {
 }
 
 function Friend({ friend, onSelection, selectedFriend }) {
-  const isSelected = selectedFriend?.id === friend.id;
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <li className={isSelected ? 'selected' : ''}>
+    <li className={isOpen ? 'selected' : ''}>
       <img src={friend.image} alt={friend.name} />
 
       <h3>{friend.name}</h3>
@@ -128,8 +126,13 @@ function Friend({ friend, onSelection, selectedFriend }) {
       )}
 
       {friend.balance === 0 && <p>You and {friend.name} are even</p>}
-      <Button onClick={() => onSelection(friend)}>
-        {isSelected ? 'Close' : 'Select'}
+      <Button
+        onClick={() => {
+          onSelection(friend);
+          setIsOpen(op => !op);
+        }}
+      >
+        {isOpen ? 'Close' : 'Select'}
       </Button>
     </li>
   );
@@ -152,7 +155,6 @@ function FormAddFriend({ onAddFriend }) {
       balance: 0,
     };
 
-    console.log(newFriend);
     onAddFriend(newFriend);
 
     setName('');
