@@ -34,7 +34,6 @@ export default function App() {
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [friends, setFriends] = useState(initialFriends);
   const [selectedFriend, setSelectedFriend] = useState(null);
-  const [bill, setBill] = useState('');
 
   function showAddFriendHander() {
     setShowAddFriend(show => !show);
@@ -51,8 +50,8 @@ export default function App() {
     setShowAddFriend(false);
   }
 
-  function inputBillHandler(e) {
-    setBill(e.target.value * 1);
+  function splitBillHandler(e) {
+    e.preventDefault();
   }
 
   return (
@@ -70,8 +69,7 @@ export default function App() {
       {selectedFriend && (
         <FormSplitBill
           selectedFriend={selectedFriend}
-          bill={bill}
-          onInputBill={inputBillHandler}
+          onSplitBill={splitBillHandler}
         />
       )}
     </div>
@@ -164,22 +162,41 @@ function FormAddFriend({ onAddFriend }) {
   );
 }
 
-function FormSplitBill({ selectedFriend, bill, onInputBill }) {
+function FormSplitBill({ selectedFriend, onSplitBill }) {
+  const [bill, setBill] = useState('');
+  const [paidByUser, setPaidByUser] = useState('');
+
+  const friendExpense = bill * 1 - paidByUser * 1;
+
+  const [whoIsPaying, setWhoIsPaying] = useState('user');
+
+  function inputBillHandler(e) {
+    setBill(e.target.value * 1);
+  }
+
+  function inputUserHandler(e) {
+    setPaidByUser(e.target.value * 1 > bill ? paidByUser : e.target.value * 1);
+  }
+
+  function toggleUserHandler(e) {
+    setWhoIsPaying(e.target.value);
+  }
+
   return (
-    <form className='form-split-bill'>
+    <form className='form-split-bill' onSubmit={onSplitBill}>
       <h2>Split bill with {selectedFriend.name}</h2>
 
       <label>💰 Bill value</label>
-      <input type='text' value={bill} onChange={onInputBill} />
+      <input type='text' value={bill} onChange={inputBillHandler} />
 
       <label>👱 Your expense</label>
-      <input type='text' />
+      <input type='text' value={paidByUser} onChange={inputUserHandler} />
 
       <label>👫 {selectedFriend.name}'s expense</label>
-      <input type='text' disabled />
+      <input type='text' disabled value={friendExpense} />
 
       <label>🤑 Who is paying the bill?</label>
-      <select>
+      <select value={whoIsPaying} onChange={toggleUserHandler}>
         <option value='user'>You</option>
         <option value='friend'>{selectedFriend.name}</option>
       </select>
